@@ -1,23 +1,30 @@
-import { IProxyServiceWorker } from "@/core/ports/proxy.service.port";
-import { Fetcher, Request as CFRequest, Response as CFResponse } from "@cloudflare/workers-types";
+import { IProxyServiceWorker } from '@/core/ports/proxy.service.port'
+import type { Fetcher, Request as CFRequest } from '@cloudflare/workers-types'
 
 export class FetchProxyWorkerService implements IProxyServiceWorker {
-    async forward(request: Request, fetcher: Fetcher, headersToAdd?: Record<string, string>): Promise<Response> {
-        let reqToForward = request
+    async forward(
+        request: Request,
+        fetcher: Fetcher,
+        headersToAdd?: Record<string, string>
+    ): Promise<Response> {
+        let requestToForward = request
 
-        if (headersToAdd) {
+        if (headersToAdd && Object.keys(headersToAdd).length > 0) {
             const headers = new Headers(request.headers)
-            Object.entries(headersToAdd).forEach(([key, value]) => {
+            for (const [key, value] of Object.entries(headersToAdd)) {
                 headers.set(key, value)
-            })
-            reqToForward = new Request(request, { headers })
+            }
+            requestToForward = new Request(request, { headers })
         }
 
-        try{
-            return await fetcher.fetch(reqToForward as unknown as CFRequest)
-        } catch(error) {
-            return new Response(JSON.stringify({ error: 'Upstream service unreachable' }), { status: 502 })
+        try {
+            const response = await fetcher.fetch(requestToForward as unknown as CFRequest)
+            return response as unknown as Response
+        } catch {
+            return new Response(JSON.stringify({ error: 'Upstream service unreachable' }), {
+                status: 502,
+                headers: { 'content-type': 'application/json' },
+            })
         }
     }
-
 }

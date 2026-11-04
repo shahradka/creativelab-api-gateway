@@ -1,12 +1,13 @@
-import { RouteRule } from "../core/domain/route-config";
+import type { RouteRule } from '@/core/domain/route-config'
 
 export const appRoutes: RouteRule[] = [
     {
-        allowedMethods: ["POST"],
-        id:"public-ai-cv-rag",
+        id: 'public-ai-cv-rag',
+        pathPattern: '/api/public/v1/rag-ai-cv',
+        targetBinding: 'RAG_AI_CV',
+        allowedMethods: ['POST'],
         isProtected: false,
-        pathPattern: '/api/public/v1/ai-cv-rag',
         cacheTtlSeconds: 10,
-        rateLimitName: 'EXPENSIVE_RATE_LIMIT'
-    }
+        rateLimitName: 'EXPENSIVE_RATE_LIMIT',
+    },
 ]

@@ -1,13 +1,14 @@
-import { IProxyServiceWorker } from "@/core/ports/proxy.service.port";
-import { Fetcher } from "@cloudflare/workers-types";
+import { IProxyServiceWorker } from '@/core/ports/proxy.service.port'
+import type { Fetcher } from '@cloudflare/workers-types'
 
-export class ProxyRequestWorkerUseCase{
-    constructor(private proxyService:IProxyServiceWorker){}
+export class ProxyRequestWorkerUseCase {
+    constructor(private proxyService: IProxyServiceWorker) {}
 
-    async execute(request: Request, targetBaseUrl: Fetcher):Promise<Response>{
-
-        const extraHeaders:Record<string, string> = {}
-
-        return this.proxyService.forward(request, targetBaseUrl, extraHeaders)
+    async execute(
+        request: Request,
+        fetcher: Fetcher,
+        extraHeaders: Record<string, string> = {}
+    ): Promise<Response> {
+        return this.proxyService.forward(request, fetcher, extraHeaders)
     }
 }
